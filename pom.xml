@@ -23,7 +23,7 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  ~ THE SOFTWARE.
  -->
- 
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,30 +41,44 @@
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job, node and system configurations.</description>
     <url>https://wiki.jenkins.io/display/JENKINS/JobConfigHistory+Plugin</url>
-    
+
     <issueManagement>
         <system>JIRA</system>
         <url>http://issues.jenkins-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+JENKINS+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
     </issueManagement>
-    
+
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/jobConfigHistory-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/jobConfigHistory-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/jobConfigHistory-plugin</url>
-        <tag>jobConfigHistory-2.18</tag>
+        <connection>scm:git:https://github.com/infonova/jobConfigHistory-plugin.git</connection>
+        <developerConnection>scm:git:https://github.com/infonova/jobConfigHistory-plugin.git</developerConnection>
+        <url>https://github.com/infonova/jobConfigHistory-plugin</url>
+        <tag>HEAD</tag>
     </scm>
-    
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-infonova</id>
+            <name>Nexus at Infonova</name>
+            <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-infonova</id>
+            <name>Nexus at Infonova</name>
+            <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-snapshots/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <ciManagement>
         <system>Jenkins</system>
         <url>https://jenkins.ci.cloudbees.com/job/plugins/job/jobConfigHistory-plugin/</url>
     </ciManagement>
-    
+
     <licenses>
         <license>
             <name>MIT License</name>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
             <id>stefanbrausch</id>
@@ -143,7 +157,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -243,7 +257,7 @@
             </plugins>
         </pluginManagement>
     </build>
-    
+
     <reporting>
         <plugins>
             <plugin>
@@ -324,5 +338,5 @@
             </plugin>
         </plugins>
     </reporting>
-    
+
 </project>
