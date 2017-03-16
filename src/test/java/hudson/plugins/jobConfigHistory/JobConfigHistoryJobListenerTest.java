@@ -101,10 +101,15 @@ public class JobConfigHistoryJobListenerTest {
 			extends
 				JobConfigHistoryJobListener {
 
-		@Override
-		ItemListenerHistoryDao getHistoryDao() {
-			return mockedConfigHistoryListenerHelper;
-		}
-	}
+        @Override
+        protected boolean isItemGeneratedByJobDsl(Item item) {
+            return false;
+        }
+
+        @Override
+        ItemListenerHistoryDao getHistoryDao() {
+            return mockedConfigHistoryListenerHelper;
+        }
+    }
 
 }
