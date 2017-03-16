@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.Extension;
+import hudson.model.Action;
+import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
@@ -41,49 +43,76 @@ import hudson.model.listeners.ItemListener;
 @Extension
 public class JobConfigHistoryJobListener extends ItemListener {
 
-	/**
-	 * Our logger.
-	 */
-	private static final Logger LOG = Logger
-			.getLogger(JobConfigHistoryJobListener.class.getName());
+    /**
+     * Our logger.
+     */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
+    private static final String CLASS_SIMPLE_NAME = "SeedJobAction";
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onCreated(Item item) {
-		LOG.log(FINEST, "In onCreated for {0}", item);
-		switchHistoryDao(item).createNewItem((item));
-		LOG.log(FINEST, "onCreated for {0} done.", item);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCreated(Item item) {
+        LOG.log(FINEST, "In onCreated for {0}", item);
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * Also checks if we have history stored under the old name. If so, copies
-	 * all history to the folder for new name, and deletes the old history
-	 * folder.
-	 */
-	@Override
-	public void onRenamed(Item item, String oldName, String newName) {
-		final String onRenameDesc = " old name: " + oldName + ", new name: "
-				+ newName;
-		LOG.log(FINEST, "In onRenamed for {0}{1}",
-				new Object[]{item, onRenameDesc});
-		switchHistoryDao(item).renameItem(item, oldName, newName);
-		LOG.log(FINEST, "Completed onRename for {0} done.", item);
-	}
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onDeleted(Item item) {
-		LOG.log(FINEST, "In onDeleted for {0}", item);
-		switchHistoryDao(item).deleteItem(item);
-		LOG.log(FINEST, "onDeleted for {0} done.", item);
-	}
+        switchHistoryDao(item).createNewItem((item));
+        LOG.log(FINEST, "onCreated for {0} done.", item);
+    }
+
+    protected boolean isItemGeneratedByJobDsl(Item item) {
+
+        if (item instanceof AbstractItem) {
+            for (Action a : ((AbstractItem) item).getAllActions()) {
+                if (CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * Also checks if we have history stored under the old name. If so, copies all history to the folder for new name, and deletes
+     * the old history folder.
+     */
+    @Override
+    public void onRenamed(Item item, String oldName, String newName) {
+        final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
+        LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[]{item, onRenameDesc});
+
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, job was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
+
+        switchHistoryDao(item).renameItem(item, oldName, newName);
+        LOG.log(FINEST, "Completed onRename for {0} done.", item);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDeleted(Item item) {
+        LOG.log(FINEST, "In onDeleted for {0}", item);
+
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
+
+        switchHistoryDao(item).deleteItem(item);
+        LOG.log(FINEST, "onDeleted for {0} done.", item);
+    }
 
 	/**
 	 * Returns ItemListenerHistoryDao depending on the item type.
