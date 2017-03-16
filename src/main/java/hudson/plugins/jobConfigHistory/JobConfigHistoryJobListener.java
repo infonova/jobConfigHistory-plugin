@@ -25,6 +25,7 @@ package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.*;
 import hudson.Extension;
+import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.listeners.ItemListener;
@@ -44,6 +45,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * Our logger.
      */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
+    private static final String CLASS_SIMPLE_NAME = "SeedJobAction";
 
     /**
      * {@inheritDoc}
@@ -51,8 +53,26 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
+
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
+
         switchHistoryDao(item).createNewItem((item));
         LOG.log(FINEST, "onCreated for {0} done.", item);
+    }
+
+    protected boolean isItemGeneratedByJobDsl(Item item) {
+
+        if (item instanceof AbstractItem) {
+            for (Action a : ((AbstractItem) item).getAllActions()) {
+                if (CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -66,6 +86,12 @@ public class JobConfigHistoryJobListener extends ItemListener {
     public void onRenamed(Item item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[]{item, onRenameDesc});
+
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, job was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
+
         switchHistoryDao(item).renameItem(item, oldName, newName);
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
     }
@@ -76,6 +102,12 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onDeleted(Item item) {
         LOG.log(FINEST, "In onDeleted for {0}", item);
+
+        if (isItemGeneratedByJobDsl(item)) {
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            return;
+        }
+
         switchHistoryDao(item).deleteItem(item);
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
