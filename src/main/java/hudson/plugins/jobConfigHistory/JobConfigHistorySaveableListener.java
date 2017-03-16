@@ -24,9 +24,12 @@
 package hudson.plugins.jobConfigHistory;
 
 import static hudson.init.InitMilestone.COMPLETED;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINEST;
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
+import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
@@ -43,6 +46,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
+    private static final String CLASS_SIMPLE_NAME = "SeedJobAction";
 
     /** {@inheritDoc} */
     @Override
@@ -50,6 +54,17 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
         final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
         if (plugin.isSaveable(o, file) && !PluginUtils.isUserExcluded(plugin)) {
+
+
+            if (o instanceof AbstractItem) {
+                for (Action a : ((AbstractItem) o).getAllActions()) {
+                    if (CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
+                        LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+                        return;
+                    }
+                }
+            }
+
             final HistoryDao configHistoryListenerHelper = getHistoryDao(plugin);
             configHistoryListenerHelper.saveItem(file);
         }
