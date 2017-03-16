@@ -1,11 +1,18 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.AbstractItem;
+import hudson.model.Action;
+import hudson.model.Item;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 import org.junit.Test;
 
@@ -101,10 +108,15 @@ public class JobConfigHistoryJobListenerTest {
 			extends
 				JobConfigHistoryJobListener {
 
-		@Override
-		ItemListenerHistoryDao getHistoryDao() {
-			return mockedConfigHistoryListenerHelper;
-		}
-	}
+        @Override
+        protected boolean isItemGeneratedByJobDsl(Item item) {
+            return false;
+        }
+
+        @Override
+        ItemListenerHistoryDao getHistoryDao() {
+            return mockedConfigHistoryListenerHelper;
+        }
+    }
 
 }
