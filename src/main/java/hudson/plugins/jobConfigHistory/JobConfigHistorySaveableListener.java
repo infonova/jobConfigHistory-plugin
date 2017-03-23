@@ -61,7 +61,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 
             if (o instanceof AbstractItem) {
                 for (Action a : ((AbstractItem) o).getAllActions()) {
-                    if (CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
+                    if (a != null && CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
                         LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
                         return;
                     }
