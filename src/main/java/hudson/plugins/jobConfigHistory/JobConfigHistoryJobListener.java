@@ -23,7 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +34,11 @@ import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
+import jenkins.model.Jenkins;
+
+import java.util.logging.Level;
+
+import java.util.logging.Logger;
 
 /**
  * Saves the job configuration if the job is created or renamed.
