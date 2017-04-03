@@ -29,6 +29,8 @@ import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.listeners.ItemListener;
+import jenkins.model.Jenkins;
+
 import java.util.logging.Level;
 
 import java.util.logging.Logger;
