@@ -23,15 +23,19 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import static java.util.logging.Level.*;
 import hudson.Extension;
+import hudson.model.AbstractItem;
 import hudson.model.Action;
 import hudson.model.Item;
-import hudson.model.AbstractItem;
 import hudson.model.listeners.ItemListener;
-import java.util.logging.Level;
+import org.apache.commons.lang.StringUtils;
 
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Saves the job configuration if the job is created or renamed.
@@ -66,8 +70,11 @@ public class JobConfigHistoryJobListener extends ItemListener {
     protected boolean isItemGeneratedByJobDsl(Item item) {
 
         if (item instanceof AbstractItem) {
-            for (Action a : ((AbstractItem) item).getAllActions()) {
-                if (CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
+            AbstractItem abstractItem = ((AbstractItem)item);
+            List<? extends Action> actions = abstractItem.getAllActions();
+
+            for (Action action : actions) {
+                if (action != null && StringUtils.equals(CLASS_SIMPLE_NAME, action.getClass().getSimpleName())) {
                     return true;
                 }
             }
