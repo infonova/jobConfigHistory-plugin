@@ -23,10 +23,16 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.*;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import hudson.Plugin;
@@ -49,7 +55,7 @@ final public class PluginUtils {
 
 	/**
 	 * Returns the plugin for tests.
-	 * 
+	 *
 	 * @return plugin
 	 */
 	public static JobConfigHistory getPlugin() {
@@ -58,7 +64,7 @@ final public class PluginUtils {
 
 	/**
 	 * For tests.
-	 * 
+	 *
 	 * @return historyDao
 	 */
 	public static JobConfigHistoryStrategy getHistoryDao() {
@@ -79,7 +85,7 @@ final public class PluginUtils {
 
 	/**
 	 * For tests.
-	 * 
+	 *
 	 * @param plugin
 	 *            the plugin.
 	 * @return historyDao
@@ -92,7 +98,7 @@ final public class PluginUtils {
 	/**
 	 * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user. Avoids
 	 * calling {@link User#current()}.
-	 * 
+	 *
 	 * @param plugin
 	 *            the plugin.
 	 * @return historyDao
@@ -135,7 +141,7 @@ final public class PluginUtils {
 
 	/**
 	 * Returns a {@link Date}.
-	 * 
+	 *
 	 * @param timeStamp
 	 *            date as string.
 	 * @return The parsed date as a java.util.Date.
@@ -161,4 +167,19 @@ final public class PluginUtils {
 			return false;
 		}
 	}
+
+    protected static boolean isItemGeneratedByJobDsl(Saveable item) {
+
+        if (item instanceof AbstractItem) {
+            AbstractItem abstractItem = ((AbstractItem)item);
+            List<? extends Action> actions = abstractItem.getAllActions();
+
+            for (Action action : actions) {
+                if (action != null && StringUtils.equals(JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME, action.getClass().getSimpleName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

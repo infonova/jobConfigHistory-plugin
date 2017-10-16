@@ -23,20 +23,16 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import static hudson.init.InitMilestone.COMPLETED;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.FINEST;
-
-import java.util.logging.Logger;
-
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractItem;
-import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import jenkins.model.Jenkins;
+
+import static hudson.init.InitMilestone.COMPLETED;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Saves the job configuration at
@@ -49,7 +45,6 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
-    private static final String CLASS_SIMPLE_NAME = "SeedJobAction";
 
     /** {@inheritDoc} */
     @Override
@@ -59,13 +54,9 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
         if (plugin.isSaveable(o, file) && !PluginUtils.isUserExcluded(plugin)) {
 
 
-            if (o instanceof AbstractItem) {
-                for (Action a : ((AbstractItem) o).getAllActions()) {
-                    if (a != null && CLASS_SIMPLE_NAME.equals(a.getClass().getSimpleName())) {
-                        LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
-                        return;
-                    }
-                }
+            if (isItemGeneratedByJobDsl(o)) {
+                LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME);
+                return;
             }
 
             final HistoryDao configHistoryListenerHelper = getHistoryDao(plugin);
@@ -93,15 +84,19 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 		return getHistoryDao(PluginUtils.getPlugin());
 	}
 
-	/**
-	 * Return the helper, making sure its anonymous while Jenkins is still
-	 * initializing.
-	 *
-	 * @return helper
-	 */
-	HistoryDao getHistoryDao(JobConfigHistory plugin) {
-		return (COMPLETED == Jenkins.getInstance().getInitLevel())
-				? PluginUtils.getHistoryDao(plugin)
-				: PluginUtils.getAnonymousHistoryDao(plugin);
-	}
+    /**
+     * Return the helper, making sure its anonymous while Jenkins is still
+     * initializing.
+     *
+     * @return helper
+     */
+    HistoryDao getHistoryDao(JobConfigHistory plugin) {
+        return (COMPLETED == Jenkins.getInstance().getInitLevel())
+                ? PluginUtils.getHistoryDao(plugin)
+                : PluginUtils.getAnonymousHistoryDao(plugin);
+    }
+
+    protected boolean isItemGeneratedByJobDsl(Saveable item) {
+        return PluginUtils.isItemGeneratedByJobDsl(item);
+    }
 }

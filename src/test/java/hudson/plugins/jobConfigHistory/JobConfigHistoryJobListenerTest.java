@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.AbstractItem;
 import hudson.model.Item;
+import hudson.model.Saveable;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -98,7 +99,7 @@ public class JobConfigHistoryJobListenerTest {
 				JobConfigHistoryJobListener {
 
         @Override
-        protected boolean isItemGeneratedByJobDsl(Item item) {
+        protected boolean isItemGeneratedByJobDsl(Saveable item) {
             return false;
         }
 
