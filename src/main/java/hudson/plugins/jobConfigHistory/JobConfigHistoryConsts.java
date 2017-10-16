@@ -60,4 +60,6 @@ public final class JobConfigHistoryConsts {
 
     /** Format for timestamped dirs. */
     public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+
+    protected static final String SEED_JOB_ACTION_SIMPLE_NAME = "SeedJobAction";
 }

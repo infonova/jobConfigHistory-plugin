@@ -23,14 +23,16 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.Hudson;
-import hudson.model.User;
+import hudson.model.*;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -158,5 +160,21 @@ final public class PluginUtils {
         } catch (ParseException ex) {
             throw new IllegalArgumentException("Could not parse Date" + timeStamp, ex);
         }
+    }
+
+
+    protected static boolean isItemGeneratedByJobDsl(Saveable item) {
+
+        if (item instanceof AbstractItem) {
+            AbstractItem abstractItem = ((AbstractItem)item);
+            List<? extends Action> actions = abstractItem.getAllActions();
+
+            for (Action action : actions) {
+                if (action != null && StringUtils.equals(JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME, action.getClass().getSimpleName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

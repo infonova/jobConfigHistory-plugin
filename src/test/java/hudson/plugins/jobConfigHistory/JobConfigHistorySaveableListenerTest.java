@@ -3,6 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.Saveable;
 import org.junit.Test;
+
 import static org.mockito.Mockito.*;
 
 /**
@@ -47,6 +48,11 @@ public class JobConfigHistorySaveableListenerTest {
         @Override
         HistoryDao getHistoryDao(JobConfigHistory plugin) {
             return mockedConfigHistoryListenerHelper;
+        }
+
+        @Override
+        protected boolean isItemGeneratedByJobDsl(Saveable item) {
+            return false;
         }
     }
 

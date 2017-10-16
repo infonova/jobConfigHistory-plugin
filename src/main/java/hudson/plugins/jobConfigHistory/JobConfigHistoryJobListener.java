@@ -25,12 +25,10 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.model.AbstractItem;
-import hudson.model.Action;
 import hudson.model.Item;
+import hudson.model.Saveable;
 import hudson.model.listeners.ItemListener;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +47,6 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * Our logger.
      */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
-    private static final String CLASS_SIMPLE_NAME = "SeedJobAction";
 
     /**
      * {@inheritDoc}
@@ -59,27 +56,12 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onCreated for {0}", item);
 
         if (isItemGeneratedByJobDsl(item)) {
-            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME);
             return;
         }
 
         switchHistoryDao(item).createNewItem((item));
         LOG.log(FINEST, "onCreated for {0} done.", item);
-    }
-
-    protected boolean isItemGeneratedByJobDsl(Item item) {
-
-        if (item instanceof AbstractItem) {
-            AbstractItem abstractItem = ((AbstractItem)item);
-            List<? extends Action> actions = abstractItem.getAllActions();
-
-            for (Action action : actions) {
-                if (action != null && StringUtils.equals(CLASS_SIMPLE_NAME, action.getClass().getSimpleName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -95,7 +77,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[]{item, onRenameDesc});
 
         if (isItemGeneratedByJobDsl(item)) {
-            LOG.log(FINE, "Action with classname {0} found, job was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            LOG.log(FINE, "Action with classname {0} found, job was identified as jobDSL-seeded.", JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME);
             return;
         }
 
@@ -111,7 +93,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onDeleted for {0}", item);
 
         if (isItemGeneratedByJobDsl(item)) {
-            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", CLASS_SIMPLE_NAME);
+            LOG.log(FINE, "Action with classname {0} found, change was identified as jobDSL-seeded.", JobConfigHistoryConsts.SEED_JOB_ACTION_SIMPLE_NAME);
             return;
         }
 
@@ -136,6 +118,11 @@ public class JobConfigHistoryJobListener extends ItemListener {
      */
     ItemListenerHistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
+    }
+
+
+    protected boolean isItemGeneratedByJobDsl(Saveable item) {
+        return PluginUtils.isItemGeneratedByJobDsl(item);
     }
 
     /**
