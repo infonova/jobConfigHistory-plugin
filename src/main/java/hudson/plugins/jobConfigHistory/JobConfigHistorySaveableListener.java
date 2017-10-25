@@ -30,6 +30,8 @@ import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import jenkins.model.Jenkins;
 
+import java.util.logging.Logger;
+
 import static hudson.init.InitMilestone.COMPLETED;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINEST;
